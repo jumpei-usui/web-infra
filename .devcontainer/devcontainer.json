@@ -1,15 +1,13 @@
 {
     "name": "Terraform",
-    "image": "hashicorp/terraform:latest",
-    "postCreateCommand": "git config core.hooksPath .githooks",
+    "image": "mcr.microsoft.com/vscode/devcontainers/base:1-bullseye",
+    "postStartCommand": "git config core.hooksPath .githooks",
+    "features": {
+        "ghcr.io/devcontainers/features/terraform:1": {}
+    },
     "customizations": {
         "vscode": {
-            "settings": {
-                "terminal.integrated.shell.linux": "/bin/bash"
-            },
-            "extensions": [
-                "hashicorp.terraform"
-            ]
+            "extensions": []
         }
     }
 }
