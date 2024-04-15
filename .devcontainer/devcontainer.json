@@ -1,6 +1,7 @@
 {
     "name": "Terraform",
     "image": "mcr.microsoft.com/vscode/devcontainers/base:1-bullseye",
+    "initializeCommand": "ssh-add ~/.ssh/private_github",
     "postStartCommand": "git config core.hooksPath .githooks",
     "features": {
         "ghcr.io/devcontainers/features/terraform:1": {}
