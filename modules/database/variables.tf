@@ -39,3 +39,8 @@ variable "key_name" {
   description = "Key name of the Key Pair to use for the instance"
   type        = string
 }
+
+variable "cidr_blocks" {
+  description = "List of CIDR blocks"
+  type        = list(string)
+}
