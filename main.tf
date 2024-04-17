@@ -1,8 +1,8 @@
 terraform {
   backend "s3" {
-    bucket = "jumpei-usui-terraform-state"
+    bucket = "usui-terraform-state"
     key    = "terraform.tfstate"
-    region = "ap-northeast-1"
+    region = "us-east-1"
 
   }
   required_providers {
@@ -15,7 +15,7 @@ terraform {
 }
 
 provider "aws" {
-  region = "ap-northeast-1"
+  region = "us-east-1"
 }
 
 module "network" {
