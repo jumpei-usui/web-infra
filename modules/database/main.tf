@@ -29,15 +29,16 @@ resource "aws_db_subnet_group" "this" {
 }
 
 resource "aws_rds_cluster" "this" {
-  cluster_identifier          = var.cluster_identifier
-  engine                      = "aurora-mysql"
-  engine_version              = var.engine_version
-  master_username             = "admin"
-  manage_master_user_password = true
-  db_subnet_group_name        = aws_db_subnet_group.this.name
-  storage_encrypted           = true
-  deletion_protection         = true
-  vpc_security_group_ids      = [aws_security_group.rds.id]
+  cluster_identifier                  = var.cluster_identifier
+  engine                              = "aurora-mysql"
+  engine_version                      = var.engine_version
+  master_username                     = "admin"
+  manage_master_user_password         = true
+  db_subnet_group_name                = aws_db_subnet_group.this.name
+  iam_database_authentication_enabled = true
+  storage_encrypted                   = true
+  deletion_protection                 = true
+  vpc_security_group_ids              = [aws_security_group.rds.id]
 
   serverlessv2_scaling_configuration {
     max_capacity = var.max_capacity
