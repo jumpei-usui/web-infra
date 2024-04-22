@@ -29,12 +29,18 @@ module "certificate" {
   domain_name = var.domain_name
 }
 
+module "firewall" {
+  source      = "./modules/firewall"
+  cidr_blocks = var.cidr_blocks
+}
+
 module "frontend" {
   source              = "./modules/frontend"
   product_name        = var.product_name
   domain_name         = var.domain_name
   acm_certificate_arn = module.certificate.frontend_acm_certificate_arn
   zone_id             = module.certificate.zone_id
+  web_acl_arn         = module.firewall.web_acl_arn
 }
 
 module "database" {
@@ -62,4 +68,5 @@ module "api" {
   rds_cluster_endpoint          = module.database.rds_cluster_endpoint
   region                        = var.region
   account_id                    = data.aws_caller_identity.this.account_id
+  web_acl_arn                   = module.firewall.web_acl_arn
 }

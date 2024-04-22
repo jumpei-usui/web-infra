@@ -291,6 +291,8 @@ resource "aws_cloudfront_distribution" "this" {
 
   http_version    = "http2"
   is_ipv6_enabled = true
+
+  web_acl_id = var.web_acl_arn
 }
 
 resource "aws_route53_record" "cloudfront_ipv4" {

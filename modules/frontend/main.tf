@@ -52,6 +52,8 @@ resource "aws_cloudfront_distribution" "this" {
   http_version        = "http2"
   default_root_object = "index.html"
   is_ipv6_enabled     = true
+
+  web_acl_id = var.web_acl_arn
 }
 
 data "aws_iam_policy_document" "this" {

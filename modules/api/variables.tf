@@ -57,3 +57,8 @@ variable "account_id" {
   description = "AWS Account ID number of the account that owns or contains the calling entity"
   type        = string
 }
+
+variable "web_acl_arn" {
+  description = "The ARN of the WAF WebACL"
+  type        = string
+}

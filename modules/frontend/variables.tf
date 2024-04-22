@@ -17,3 +17,8 @@ variable "zone_id" {
   description = "The Hosted Zone ID"
   type        = string
 }
+
+variable "web_acl_arn" {
+  description = "The ARN of the WAF WebACL"
+  type        = string
+}
