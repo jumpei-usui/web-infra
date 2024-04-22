@@ -46,10 +46,35 @@ resource "aws_lb_listener" "this" {
   protocol          = "HTTPS"
   port              = 443
   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  certificate_arn   = var.acm_certificate_arn
 
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.this.arn
+  }
+}
+
+resource "aws_route53_record" "ipv4" {
+  zone_id = var.zone_id
+  name    = "alb.${var.domain_name}"
+  type    = "A"
+
+  alias {
+    name                   = "dualstack.${aws_lb.this.dns_name}"
+    zone_id                = aws_lb.this.zone_id
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "ipv6" {
+  zone_id = var.zone_id
+  name    = "alb.${var.domain_name}"
+  type    = "AAAA"
+
+  alias {
+    name                   = "dualstack.${aws_lb.this.dns_name}"
+    zone_id                = aws_lb.this.zone_id
+    evaluate_target_health = false
   }
 }
 

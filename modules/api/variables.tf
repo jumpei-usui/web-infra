@@ -22,3 +22,18 @@ variable "private_subnet_ids" {
   description = "A list of VPC subnet IDs"
   type        = list(string)
 }
+
+variable "acm_certificate_arn" {
+  description = "ARN of the certificate"
+  type        = string
+}
+
+variable "zone_id" {
+  description = "The Hosted Zone ID"
+  type        = string
+}
+
+variable "domain_name" {
+  description = "This is the name of the hosted zone"
+  type        = string
+}
