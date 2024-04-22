@@ -45,7 +45,8 @@ module "api" {
   vpc_default_security_group_id = module.network.vpc_default_security_group_id
   public_subnet_ids             = module.network.public_subnet_ids
   private_subnet_ids            = module.network.private_subnet_ids
-  acm_certificate_arn           = module.routing.acm_certificate_arn
+  alb_acm_certificate_arn       = module.routing.alb_acm_certificate_arn
+  api_acm_certificate_arn       = module.routing.api_acm_certificate_arn
   zone_id                       = module.routing.zone_id
   domain_name                   = var.domain_name
 }

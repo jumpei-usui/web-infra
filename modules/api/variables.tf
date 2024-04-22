@@ -23,7 +23,12 @@ variable "private_subnet_ids" {
   type        = list(string)
 }
 
-variable "acm_certificate_arn" {
+variable "alb_acm_certificate_arn" {
+  description = "ARN of the certificate"
+  type        = string
+}
+
+variable "api_acm_certificate_arn" {
   description = "ARN of the certificate"
   type        = string
 }

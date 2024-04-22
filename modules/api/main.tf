@@ -46,7 +46,7 @@ resource "aws_lb_listener" "this" {
   protocol          = "HTTPS"
   port              = 443
   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
-  certificate_arn   = var.acm_certificate_arn
+  certificate_arn   = var.alb_acm_certificate_arn
 
   default_action {
     type             = "forward"
@@ -54,7 +54,7 @@ resource "aws_lb_listener" "this" {
   }
 }
 
-resource "aws_route53_record" "ipv4" {
+resource "aws_route53_record" "alb_ipv4" {
   zone_id = var.zone_id
   name    = "alb.${var.domain_name}"
   type    = "A"
@@ -66,7 +66,7 @@ resource "aws_route53_record" "ipv4" {
   }
 }
 
-resource "aws_route53_record" "ipv6" {
+resource "aws_route53_record" "alb_ipv6" {
   zone_id = var.zone_id
   name    = "alb.${var.domain_name}"
   type    = "AAAA"
@@ -117,5 +117,87 @@ resource "aws_ecs_service" "this" {
     container_name   = "test"
     container_port   = 80
     target_group_arn = aws_lb_target_group.this.arn
+  }
+}
+
+data "aws_cloudfront_cache_policy" "this" {
+  name = "Managed-CachingDisabled"
+}
+
+data "aws_cloudfront_origin_request_policy" "this" {
+  name = "Managed-AllViewer"
+}
+
+resource "aws_cloudfront_distribution" "this" {
+  enabled = "true"
+
+  origin {
+    origin_id   = "alb.${var.domain_name}"
+    domain_name = "alb.${var.domain_name}"
+
+    custom_origin_config {
+      origin_protocol_policy   = "https-only"
+      http_port                = 80
+      https_port               = 443
+      origin_ssl_protocols     = ["TLSv1.2"]
+      origin_read_timeout      = 30
+      origin_keepalive_timeout = 5
+    }
+
+    connection_attempts = 3
+    connection_timeout  = 10
+  }
+
+  default_cache_behavior {
+    target_origin_id         = "alb.${var.domain_name}"
+    compress                 = true
+    viewer_protocol_policy   = "https-only"
+    allowed_methods          = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
+    cached_methods           = ["GET", "HEAD"]
+    cache_policy_id          = data.aws_cloudfront_cache_policy.this.id
+    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.this.id
+  }
+
+  price_class = "PriceClass_All"
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+    }
+  }
+
+  aliases = ["api.${var.domain_name}"]
+
+  viewer_certificate {
+    acm_certificate_arn      = var.api_acm_certificate_arn
+    minimum_protocol_version = "TLSv1.2_2021"
+    ssl_support_method       = "sni-only"
+  }
+
+  http_version    = "http2"
+  is_ipv6_enabled = true
+}
+
+resource "aws_route53_record" "cloudfront_ipv4" {
+  zone_id = var.zone_id
+  name    = "api.${var.domain_name}"
+  type    = "A"
+
+  alias {
+    name                   = aws_cloudfront_distribution.this.domain_name
+    zone_id                = aws_cloudfront_distribution.this.hosted_zone_id
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "cloudfront_ipv6" {
+  zone_id = var.zone_id
+  name    = "api.${var.domain_name}"
+  type    = "AAAA"
+
+  alias {
+    name                   = aws_cloudfront_distribution.this.domain_name
+    zone_id                = aws_cloudfront_distribution.this.hosted_zone_id
+    evaluate_target_health = false
   }
 }
