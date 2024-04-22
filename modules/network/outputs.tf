@@ -18,7 +18,7 @@ output "public_subnet_ids" {
   value       = [aws_subnet.public_1.id, aws_subnet.public_2.id]
 }
 
-output "vpc_security_group_id" {
+output "vpc_default_security_group_id" {
   description = "The ID of the security group created by default on VPC creation"
   value       = aws_vpc.this.default_security_group_id
 }

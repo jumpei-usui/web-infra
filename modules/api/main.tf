@@ -1,7 +1,3 @@
-resource "aws_ecr_repository" "this" {
-  name = "${var.product_name}-api"
-}
-
 data "aws_ec2_managed_prefix_list" "cloudfront" {
   name = "com.amazonaws.global.cloudfront.origin-facing"
 }
@@ -22,7 +18,7 @@ resource "aws_lb" "this" {
   internal           = false
   ip_address_type    = "ipv4"
   subnets            = var.public_subnet_ids
-  security_groups    = [var.vpc_security_group_id, aws_security_group.this.id]
+  security_groups    = [var.vpc_default_security_group_id, aws_security_group.this.id]
 }
 
 resource "aws_lb_target_group" "this" {
@@ -53,6 +49,48 @@ resource "aws_lb_listener" "this" {
 
   default_action {
     type             = "forward"
+    target_group_arn = aws_lb_target_group.this.arn
+  }
+}
+
+resource "aws_ecr_repository" "this" {
+  name = "${var.product_name}-api"
+}
+
+resource "aws_ecs_cluster" "this" {
+  name = "${var.product_name}-cluster"
+}
+
+resource "aws_ecs_service" "this" {
+  name             = "${var.product_name}-service"
+  cluster          = aws_ecs_cluster.this.id
+  launch_type      = "FARGATE"
+  platform_version = "LATEST"
+  # task_definition     = 
+  scheduling_strategy = "REPLICA"
+  desired_count       = 1
+
+  deployment_controller {
+    type = "ECS"
+  }
+
+  deployment_minimum_healthy_percent = 100
+  deployment_maximum_percent         = 200
+
+  deployment_circuit_breaker {
+    enable   = true
+    rollback = true
+  }
+
+  network_configuration {
+    subnets          = var.private_subnet_ids
+    security_groups  = [var.vpc_default_security_group_id]
+    assign_public_ip = false
+  }
+
+  load_balancer {
+    container_name   = "test"
+    container_port   = 80
     target_group_arn = aws_lb_target_group.this.arn
   }
 }

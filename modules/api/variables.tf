@@ -8,12 +8,17 @@ variable "vpc_id" {
   type        = string
 }
 
-variable "vpc_security_group_id" {
+variable "vpc_default_security_group_id" {
   description = "The ID of the security group created by default on VPC creation"
   type        = string
 }
 
 variable "public_subnet_ids" {
+  description = "A list of VPC subnet IDs"
+  type        = list(string)
+}
+
+variable "private_subnet_ids" {
   description = "A list of VPC subnet IDs"
   type        = list(string)
 }

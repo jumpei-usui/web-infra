@@ -34,9 +34,10 @@ module "database" {
 }
 
 module "api" {
-  source                = "./modules/api"
-  product_name          = var.product_name
-  vpc_id                = module.network.vpc_id
-  vpc_security_group_id = module.network.vpc_security_group_id
-  public_subnet_ids     = module.network.public_subnet_ids
+  source                        = "./modules/api"
+  product_name                  = var.product_name
+  vpc_id                        = module.network.vpc_id
+  vpc_default_security_group_id = module.network.vpc_default_security_group_id
+  public_subnet_ids             = module.network.public_subnet_ids
+  private_subnet_ids            = module.network.private_subnet_ids
 }
