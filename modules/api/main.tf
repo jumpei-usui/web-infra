@@ -208,7 +208,7 @@ resource "aws_ecs_service" "this" {
   platform_version    = "LATEST"
   task_definition     = aws_ecs_task_definition.this.arn_without_revision
   scheduling_strategy = "REPLICA"
-  desired_count       = 1
+  desired_count       = 2
 
   deployment_controller {
     type = "ECS"
