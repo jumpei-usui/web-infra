@@ -42,3 +42,18 @@ variable "domain_name" {
   description = "This is the name of the hosted zone"
   type        = string
 }
+
+variable "rds_cluster_endpoint" {
+  description = "DNS address of the RDS instance"
+  type        = string
+}
+
+variable "region" {
+  description = "AWS Region where the provider will operate"
+  type        = string
+}
+
+variable "account_id" {
+  description = "AWS Account ID number of the account that owns or contains the calling entity"
+  type        = string
+}

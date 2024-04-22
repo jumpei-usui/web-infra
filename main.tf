@@ -15,8 +15,10 @@ terraform {
 }
 
 provider "aws" {
-  region = "us-east-1"
+  region = var.region
 }
+
+data "aws_caller_identity" "this" {}
 
 module "network" {
   source = "./modules/network"
@@ -49,4 +51,7 @@ module "api" {
   api_acm_certificate_arn       = module.routing.api_acm_certificate_arn
   zone_id                       = module.routing.zone_id
   domain_name                   = var.domain_name
+  rds_cluster_endpoint          = module.database.rds_cluster_endpoint
+  region                        = var.region
+  account_id                    = data.aws_caller_identity.this.account_id
 }

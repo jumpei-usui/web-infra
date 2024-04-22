@@ -82,16 +82,131 @@ resource "aws_ecr_repository" "this" {
   name = "${var.product_name}-api"
 }
 
+data "aws_iam_policy" "ecs_task_execution" {
+  name = "AmazonECSTaskExecutionRolePolicy"
+}
+
+resource "aws_iam_role" "ecs_task_execution" {
+  name = "ECSTaskExecution"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "ecs-tasks.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      },
+    ]
+  })
+
+  managed_policy_arns = [data.aws_iam_policy.ecs_task_execution.arn]
+}
+
+resource "aws_iam_role" "ecs_database_connection" {
+  name = "ECSDatabaseConnection"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "ecs-tasks.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      },
+    ]
+  })
+
+  inline_policy {
+    name = "DatabaseConnectionPolicy"
+
+    policy = jsonencode({
+      Version = "2012-10-17"
+      Statement = [
+        {
+          Effect = "Allow"
+          Action = [
+            "rds-db:connect"
+          ]
+          Resource = [
+            "arn:aws:rds-db:${var.region}:${var.account_id}:dbuser:*/*"
+          ]
+        },
+      ]
+    })
+  }
+}
+
+resource "aws_cloudwatch_log_group" "this" {
+  name = "/ecs/${var.product_name}-api"
+}
+
 resource "aws_ecs_cluster" "this" {
   name = "${var.product_name}-cluster"
 }
 
+resource "aws_ecs_task_definition" "this" {
+  family                   = "${var.product_name}-api"
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  cpu                      = "256"
+  memory                   = "512"
+  execution_role_arn       = aws_iam_role.ecs_task_execution.arn
+  task_role_arn            = aws_iam_role.ecs_database_connection.arn
+  container_definitions = jsonencode([
+    {
+      name      = "${var.product_name}-api"
+      image     = "${resource.aws_ecr_repository.this.repository_url}:latest"
+      essential = true
+      portMappings = [
+        {
+          containerPort = 80
+          hostPort      = 80
+          protocol      = "tcp"
+        }
+      ]
+      cpu    = 256
+      memory = 512
+      environment = [
+        {
+          name  = "DBNAME"
+          value = "main"
+        },
+        {
+          name  = "ENDPOINT"
+          value = "${var.rds_cluster_endpoint}"
+        },
+        {
+          name  = "REGION"
+          value = "us-east-1"
+        },
+        {
+          name  = "USER"
+          value = "api"
+        }
+      ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          "awslogs-group"         = "/ecs/${var.product_name}-api"
+          "awslogs-region"        = "${var.region}"
+          "awslogs-stream-prefix" = "ecs"
+        }
+      }
+    }
+  ])
+}
+
 resource "aws_ecs_service" "this" {
-  name             = "${var.product_name}-service"
-  cluster          = aws_ecs_cluster.this.id
-  launch_type      = "FARGATE"
-  platform_version = "LATEST"
-  # task_definition     = 
+  name                = "${var.product_name}-service"
+  cluster             = aws_ecs_cluster.this.id
+  launch_type         = "FARGATE"
+  platform_version    = "LATEST"
+  task_definition     = aws_ecs_task_definition.this.arn_without_revision
   scheduling_strategy = "REPLICA"
   desired_count       = 1
 
@@ -114,7 +229,7 @@ resource "aws_ecs_service" "this" {
   }
 
   load_balancer {
-    container_name   = "test"
+    container_name   = "${var.product_name}-api"
     container_port   = 80
     target_group_arn = aws_lb_target_group.this.arn
   }

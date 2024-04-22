@@ -1,3 +1,8 @@
+variable "region" {
+  description = "AWS Region where the provider will operate"
+  type        = string
+}
+
 variable "product_name" {
   description = "The name of the product"
   type        = string
