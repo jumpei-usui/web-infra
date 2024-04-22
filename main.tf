@@ -24,8 +24,8 @@ module "network" {
   source = "./modules/network"
 }
 
-module "routing" {
-  source      = "./modules/routing"
+module "certificate" {
+  source      = "./modules/certificate"
   domain_name = var.domain_name
 }
 
@@ -33,8 +33,8 @@ module "frontend" {
   source              = "./modules/frontend"
   product_name        = var.product_name
   domain_name         = var.domain_name
-  acm_certificate_arn = module.routing.frontend_acm_certificate_arn
-  zone_id             = module.routing.zone_id
+  acm_certificate_arn = module.certificate.frontend_acm_certificate_arn
+  zone_id             = module.certificate.zone_id
 }
 
 module "database" {
@@ -55,9 +55,9 @@ module "api" {
   vpc_default_security_group_id = module.network.vpc_default_security_group_id
   public_subnet_ids             = module.network.public_subnet_ids
   private_subnet_ids            = module.network.private_subnet_ids
-  alb_acm_certificate_arn       = module.routing.alb_acm_certificate_arn
-  api_acm_certificate_arn       = module.routing.api_acm_certificate_arn
-  zone_id                       = module.routing.zone_id
+  alb_acm_certificate_arn       = module.certificate.alb_acm_certificate_arn
+  api_acm_certificate_arn       = module.certificate.api_acm_certificate_arn
+  zone_id                       = module.certificate.zone_id
   domain_name                   = var.domain_name
   rds_cluster_endpoint          = module.database.rds_cluster_endpoint
   region                        = var.region
