@@ -29,6 +29,14 @@ module "routing" {
   domain_name = var.domain_name
 }
 
+module "frontend" {
+  source              = "./modules/frontend"
+  product_name        = var.product_name
+  domain_name         = var.domain_name
+  acm_certificate_arn = module.routing.frontend_acm_certificate_arn
+  zone_id             = module.routing.zone_id
+}
+
 module "database" {
   source             = "./modules/database"
   engine_version     = "8.0.mysql_aurora.3.04.2"

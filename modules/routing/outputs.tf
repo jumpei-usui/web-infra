@@ -12,3 +12,8 @@ output "api_acm_certificate_arn" {
   description = "ARN of the certificate"
   value       = aws_acm_certificate.api.arn
 }
+
+output "frontend_acm_certificate_arn" {
+  description = "ARN of the certificate"
+  value       = aws_acm_certificate.frontend.arn
+}
