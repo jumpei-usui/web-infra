@@ -208,7 +208,7 @@ resource "aws_ecs_service" "this" {
   platform_version    = "LATEST"
   task_definition     = aws_ecs_task_definition.this.arn_without_revision
   scheduling_strategy = "REPLICA"
-  desired_count       = 2
+  desired_count       = 1
 
   deployment_controller {
     type = "ECS"
@@ -320,8 +320,8 @@ resource "aws_route53_record" "cloudfront_ipv6" {
 }
 
 resource "aws_appautoscaling_target" "ecs_target" {
-  max_capacity       = 4
-  min_capacity       = 2
+  max_capacity       = 2
+  min_capacity       = 1
   resource_id        = "service/${aws_ecs_cluster.this.name}/${aws_ecs_service.this.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
