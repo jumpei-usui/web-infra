@@ -17,3 +17,8 @@ variable "domain_name" {
   description = "This is the name of the hosted zone"
   type        = string
 }
+
+variable "metadata_url" {
+  description = "The URL of the SAML metadata"
+  type        = string
+}

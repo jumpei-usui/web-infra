@@ -70,3 +70,9 @@ module "api" {
   account_id                    = data.aws_caller_identity.this.account_id
   web_acl_arn                   = module.firewall.web_acl_arn
 }
+
+module "auth" {
+  source       = "./modules/auth"
+  product_name = var.product_name
+  metadata_url = var.metadata_url
+}
