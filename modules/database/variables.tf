@@ -1,10 +1,5 @@
-variable "cluster_identifier" {
-  description = "The cluster identifier"
-  type        = string
-}
-
-variable "engine_version" {
-  description = "Database engine version"
+variable "product_name" {
+  description = "The name of the product"
   type        = string
 }
 

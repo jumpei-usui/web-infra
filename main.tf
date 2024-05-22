@@ -46,29 +46,28 @@ module "frontend" {
 
 module "database" {
   source                     = "./modules/database"
-  engine_version             = "8.0.mysql_aurora.3.04.2"
-  cluster_identifier         = "${var.product_name}-database"
+  product_name               = var.product_name
   vpc_id                     = module.network.vpc_id
   subnet_ids                 = module.network.private_subnet_ids
-  subnet_id                  = module.network.public_subnet_id
   private_subnet_cidr_blocks = module.network.private_subnet_cidr_blocks
+  subnet_id                  = module.network.public_subnet_id
 }
 
 module "api" {
   source                        = "./modules/api"
+  region                        = var.region
   product_name                  = var.product_name
   domain_name                   = var.domain_name
-  zone_id                       = module.certificate.zone_id
-  alb_acm_certificate_arn       = module.certificate.alb_acm_certificate_arn
-  api_acm_certificate_arn       = module.certificate.api_acm_certificate_arn
-  web_acl_arn                   = module.firewall.web_acl_arn
-  public_subnet_ids             = module.network.public_subnet_ids
-  private_subnet_ids            = module.network.private_subnet_ids
-  vpc_id                        = module.network.vpc_id
-  region                        = var.region
   account_id                    = data.aws_caller_identity.this.account_id
-  rds_cluster_endpoint          = module.database.rds_cluster_endpoint
+  vpc_id                        = module.network.vpc_id
+  private_subnet_ids            = module.network.private_subnet_ids
+  public_subnet_ids             = module.network.public_subnet_ids
   vpc_default_security_group_id = module.network.vpc_default_security_group_id
+  zone_id                       = module.certificate.zone_id
+  api_acm_certificate_arn       = module.certificate.api_acm_certificate_arn
+  alb_acm_certificate_arn       = module.certificate.alb_acm_certificate_arn
+  web_acl_arn                   = module.firewall.web_acl_arn
+  rds_cluster_endpoint          = module.database.rds_cluster_endpoint
 }
 
 module "auth" {

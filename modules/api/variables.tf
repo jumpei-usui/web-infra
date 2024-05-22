@@ -1,3 +1,8 @@
+variable "region" {
+  description = "AWS Region where the provider will operate"
+  type        = string
+}
+
 variable "product_name" {
   description = "The name of the product"
   type        = string
@@ -5,6 +10,31 @@ variable "product_name" {
 
 variable "domain_name" {
   description = "This is the name of the hosted zone"
+  type        = string
+}
+
+variable "account_id" {
+  description = "AWS Account ID number of the account that owns or contains the calling entity"
+  type        = string
+}
+
+variable "vpc_id" {
+  description = "The ID of the VPC"
+  type        = string
+}
+
+variable "private_subnet_ids" {
+  description = "A list of VPC subnet IDs"
+  type        = list(string)
+}
+
+variable "public_subnet_ids" {
+  description = "A list of VPC subnet IDs"
+  type        = list(string)
+}
+
+variable "vpc_default_security_group_id" {
+  description = "The ID of the security group created by default on VPC creation"
   type        = string
 }
 
@@ -28,37 +58,7 @@ variable "web_acl_arn" {
   type        = string
 }
 
-variable "public_subnet_ids" {
-  description = "A list of VPC subnet IDs"
-  type        = list(string)
-}
-
-variable "private_subnet_ids" {
-  description = "A list of VPC subnet IDs"
-  type        = list(string)
-}
-
-variable "vpc_id" {
-  description = "The ID of the VPC"
-  type        = string
-}
-
-variable "region" {
-  description = "AWS Region where the provider will operate"
-  type        = string
-}
-
-variable "account_id" {
-  description = "AWS Account ID number of the account that owns or contains the calling entity"
-  type        = string
-}
-
 variable "rds_cluster_endpoint" {
   description = "DNS address of the RDS instance"
-  type        = string
-}
-
-variable "vpc_default_security_group_id" {
-  description = "The ID of the security group created by default on VPC creation"
   type        = string
 }
