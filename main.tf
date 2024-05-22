@@ -75,7 +75,7 @@ module "api" {
 module "auth" {
   source        = "./modules/auth"
   product_name  = var.product_name
-  metadata_url  = var.metadata_url
   callback_urls = ["http://localhost:3000", "https://${var.domain_name}"]
   logout_urls   = ["http://localhost:3000", "https://${var.domain_name}"]
+  metadata_url  = var.metadata_url
 }

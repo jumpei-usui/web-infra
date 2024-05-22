@@ -3,11 +3,6 @@ variable "product_name" {
   type        = string
 }
 
-variable "metadata_url" {
-  description = "The URL of the SAML metadata"
-  type        = string
-}
-
 variable "callback_urls" {
   description = "List of allowed callback URLs for the identity providers"
   type        = list(string)
@@ -16,4 +11,9 @@ variable "callback_urls" {
 variable "logout_urls" {
   description = "List of allowed logout URLs for the identity providers"
   type        = list(string)
+}
+
+variable "metadata_url" {
+  description = "The URL of the SAML metadata"
+  type        = string
 }
