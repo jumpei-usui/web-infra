@@ -8,13 +8,13 @@ variable "domain_name" {
   type        = string
 }
 
-variable "acm_certificate_arn" {
-  description = "ARN of the certificate"
+variable "zone_id" {
+  description = "The Hosted Zone ID"
   type        = string
 }
 
-variable "zone_id" {
-  description = "The Hosted Zone ID"
+variable "acm_certificate_arn" {
+  description = "ARN of the certificate"
   type        = string
 }
 
