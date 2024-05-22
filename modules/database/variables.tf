@@ -35,11 +35,6 @@ variable "subnet_id" {
   type        = string
 }
 
-variable "key_name" {
-  description = "Key name of the Key Pair to use for the instance"
-  type        = string
-}
-
 variable "private_subnet_cidr_blocks" {
   description = "List of CIDR blocks"
   type        = list(string)
