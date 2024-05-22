@@ -52,8 +52,13 @@ resource "aws_cloudfront_distribution" "this" {
   http_version        = "http2"
   default_root_object = "index.html"
   is_ipv6_enabled     = true
+  web_acl_id          = var.web_acl_arn
 
-  web_acl_id = var.web_acl_arn
+  custom_error_response {
+    error_code         = 403
+    response_page_path = "/index.html"
+    response_code      = 200
+  }
 }
 
 data "aws_iam_policy_document" "this" {
