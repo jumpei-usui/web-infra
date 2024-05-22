@@ -15,6 +15,10 @@ resource "aws_cognito_identity_provider" "this" {
     given_name  = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname"
     name        = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
   }
+
+  lifecycle {
+    ignore_changes = [provider_details]
+  }
 }
 
 resource "aws_cognito_user_pool_domain" "this" {
@@ -26,8 +30,8 @@ resource "aws_cognito_user_pool_client" "this" {
   name                                 = var.product_name
   user_pool_id                         = aws_cognito_user_pool.this.id
   explicit_auth_flows                  = ["ALLOW_REFRESH_TOKEN_AUTH"]
-  callback_urls                        = ["http://localhost:3000"]
-  logout_urls                          = ["http://localhost:3000"]
+  callback_urls                        = var.callback_urls
+  logout_urls                          = var.logout_urls
   supported_identity_providers         = [aws_cognito_identity_provider.this.provider_name]
   allowed_oauth_flows_user_pool_client = true
   allowed_oauth_flows                  = ["code"]
