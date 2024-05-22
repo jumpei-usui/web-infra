@@ -40,7 +40,7 @@ variable "key_name" {
   type        = string
 }
 
-variable "cidr_blocks" {
+variable "private_subnet_cidr_blocks" {
   description = "List of CIDR blocks"
   type        = list(string)
 }

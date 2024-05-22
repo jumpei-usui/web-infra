@@ -6,6 +6,15 @@ resource "aws_security_group" "ec2" {
   vpc_id = var.vpc_id
 }
 
+resource "aws_security_group_rule" "rds_private_subnet" {
+  type              = "ingress"
+  from_port         = 3306
+  to_port           = 3306
+  protocol          = "tcp"
+  cidr_blocks       = var.private_subnet_cidr_blocks
+  security_group_id = aws_security_group.rds.id
+}
+
 resource "aws_security_group_rule" "rds_ec2" {
   type                     = "ingress"
   from_port                = 3306
@@ -29,6 +38,7 @@ resource "aws_db_subnet_group" "this" {
 }
 
 resource "aws_rds_cluster" "this" {
+  apply_immediately                   = true
   cluster_identifier                  = var.cluster_identifier
   engine                              = "aurora-mysql"
   engine_version                      = var.engine_version
@@ -47,7 +57,7 @@ resource "aws_rds_cluster" "this" {
 }
 
 resource "aws_iam_role" "this" {
-  name = "rds-monitoring-role"
+  name = "RDSMonitoringRole"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -80,6 +90,32 @@ resource "aws_rds_cluster_instance" "this" {
   monitoring_role_arn          = aws_iam_role.this.arn
 }
 
+resource "aws_appautoscaling_target" "this" {
+  service_namespace  = "rds"
+  scalable_dimension = "rds:cluster:ReadReplicaCount"
+  resource_id        = "cluster:${aws_rds_cluster.this.id}"
+  min_capacity       = 1
+  max_capacity       = 1
+}
+
+resource "aws_appautoscaling_policy" "this" {
+  name               = "RDSReaderAverageCPUUtilization"
+  policy_type        = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.this.resource_id
+  scalable_dimension = aws_appautoscaling_target.this.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.this.service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "RDSReaderAverageCPUUtilization"
+    }
+
+    target_value       = 70
+    scale_in_cooldown  = 300
+    scale_out_cooldown = 300
+  }
+}
+
 data "aws_ami" "this" {
   most_recent = true
   owners      = ["amazon"]
@@ -90,21 +126,46 @@ data "aws_ami" "this" {
   }
 }
 
-resource "aws_security_group" "ssh" {
+resource "aws_security_group" "ssm" {
   vpc_id = var.vpc_id
 
   ingress {
-    from_port   = 22
-    to_port     = 22
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = var.cidr_blocks
+    cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+resource "aws_iam_role" "ec2" {
+  name = "EC2SessionManagerRole"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid    = "",
+        Effect = "Allow",
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        },
+        Action = "sts:AssumeRole"
+    }]
+  })
+
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  ]
+}
+
+resource "aws_iam_instance_profile" "this" {
+  role = aws_iam_role.ec2.name
 }
 
 resource "aws_instance" "this" {
   ami                    = data.aws_ami.this.id
   instance_type          = "t4g.nano"
-  key_name               = var.key_name
   subnet_id              = var.subnet_id
-  vpc_security_group_ids = [aws_security_group.ec2.id, aws_security_group.ssh.id]
+  vpc_security_group_ids = [aws_security_group.ec2.id, aws_security_group.ssm.id]
+  iam_instance_profile   = aws_iam_instance_profile.this.id
 }
