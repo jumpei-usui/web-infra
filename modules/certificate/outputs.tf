@@ -3,9 +3,9 @@ output "zone_id" {
   value       = data.aws_route53_zone.this.zone_id
 }
 
-output "alb_acm_certificate_arn" {
+output "frontend_acm_certificate_arn" {
   description = "ARN of the certificate"
-  value       = aws_acm_certificate.alb.arn
+  value       = aws_acm_certificate.frontend.arn
 }
 
 output "api_acm_certificate_arn" {
@@ -13,7 +13,7 @@ output "api_acm_certificate_arn" {
   value       = aws_acm_certificate.api.arn
 }
 
-output "frontend_acm_certificate_arn" {
+output "alb_acm_certificate_arn" {
   description = "ARN of the certificate"
-  value       = aws_acm_certificate.frontend.arn
+  value       = aws_acm_certificate.alb.arn
 }
