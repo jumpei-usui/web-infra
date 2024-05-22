@@ -41,7 +41,7 @@ resource "aws_rds_cluster" "this" {
   apply_immediately                   = true
   cluster_identifier                  = "${var.product_name}-database"
   engine                              = "aurora-mysql"
-  engine_version                      = "8.0.mysql_aurora.3.04.2"
+  engine_version                      = var.engine_version
   master_username                     = "admin"
   manage_master_user_password         = true
   db_subnet_group_name                = aws_db_subnet_group.this.name
@@ -116,6 +116,55 @@ resource "aws_appautoscaling_policy" "this" {
   }
 }
 
+resource "aws_security_group" "ssm" {
+  vpc_id = var.vpc_id
+}
+
+resource "aws_security_group_rule" "ssm_ec2" {
+  type                     = "ingress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.ec2.id
+  security_group_id        = aws_security_group.ssm.id
+}
+
+resource "aws_security_group_rule" "ec2_ssm" {
+  type                     = "egress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.ssm.id
+  security_group_id        = aws_security_group.ec2.id
+}
+
+resource "aws_vpc_endpoint" "ssm" {
+  service_name        = "com.amazonaws.${var.region}.ssm"
+  vpc_endpoint_type   = "Interface"
+  vpc_id              = var.vpc_id
+  subnet_ids          = [var.subnet_id]
+  private_dns_enabled = true
+  security_group_ids  = [aws_security_group.ssm.id]
+}
+
+resource "aws_vpc_endpoint" "ssmmessages" {
+  service_name        = "com.amazonaws.${var.region}.ssmmessages"
+  vpc_endpoint_type   = "Interface"
+  vpc_id              = var.vpc_id
+  subnet_ids          = [var.subnet_id]
+  private_dns_enabled = true
+  security_group_ids  = [aws_security_group.ssm.id]
+}
+
+resource "aws_vpc_endpoint" "ec2messages" {
+  service_name        = "com.amazonaws.${var.region}.ec2messages"
+  vpc_endpoint_type   = "Interface"
+  vpc_id              = var.vpc_id
+  subnet_ids          = [var.subnet_id]
+  private_dns_enabled = true
+  security_group_ids  = [aws_security_group.ssm.id]
+}
+
 data "aws_ami" "this" {
   most_recent = true
   owners      = ["amazon"]
@@ -123,17 +172,6 @@ data "aws_ami" "this" {
   filter {
     name   = "name"
     values = ["al2023-ami-2023.*-arm64"]
-  }
-}
-
-resource "aws_security_group" "ssm" {
-  vpc_id = var.vpc_id
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
@@ -166,6 +204,6 @@ resource "aws_instance" "this" {
   ami                    = data.aws_ami.this.id
   instance_type          = "t4g.nano"
   subnet_id              = var.subnet_id
-  vpc_security_group_ids = [aws_security_group.ec2.id, aws_security_group.ssm.id]
+  vpc_security_group_ids = [aws_security_group.ec2.id]
   iam_instance_profile   = aws_iam_instance_profile.this.id
 }

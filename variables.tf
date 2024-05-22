@@ -3,6 +3,11 @@ variable "region" {
   type        = string
 }
 
+variable "availability_zones" {
+  description = "A list of AZ for the subnet"
+  type        = list(string)
+}
+
 variable "product_name" {
   description = "The name of the product"
   type        = string

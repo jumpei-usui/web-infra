@@ -22,7 +22,8 @@ provider "aws" {
 data "aws_caller_identity" "this" {}
 
 module "network" {
-  source = "./modules/network"
+  source             = "./modules/network"
+  availability_zones = var.availability_zones
 }
 
 module "certificate" {
@@ -46,6 +47,7 @@ module "frontend" {
 
 module "database" {
   source                     = "./modules/database"
+  region                     = var.region
   product_name               = var.product_name
   vpc_id                     = module.network.vpc_id
   subnet_id                  = module.network.private_subnet_id

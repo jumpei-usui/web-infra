@@ -22,6 +22,17 @@ variable "autoscaling_max_capacity" {
   default     = 1
 }
 
+variable "engine_version" {
+  description = "Database engine version"
+  type        = string
+  default     = "8.0.mysql_aurora.3.04.2"
+}
+
+variable "region" {
+  description = "AWS Region where the provider will operate"
+  type        = string
+}
+
 variable "product_name" {
   description = "The name of the product"
   type        = string
