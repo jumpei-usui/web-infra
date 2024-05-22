@@ -292,7 +292,7 @@ resource "aws_ecs_service" "this" {
   platform_version    = "LATEST"
   task_definition     = aws_ecs_task_definition.this.arn_without_revision
   scheduling_strategy = "REPLICA"
-  desired_count       = 2
+  desired_count       = var.autoscaling_min_capacity
 
   deployment_controller {
     type = "ECS"
@@ -324,8 +324,8 @@ resource "aws_ecs_service" "this" {
 }
 
 resource "aws_appautoscaling_target" "ecs_target" {
-  max_capacity       = 4
-  min_capacity       = 2
+  min_capacity       = var.autoscaling_min_capacity
+  max_capacity       = var.autoscaling_max_capacity
   resource_id        = "service/${aws_ecs_cluster.this.name}/${aws_ecs_service.this.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"

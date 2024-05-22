@@ -1,3 +1,15 @@
+variable "autoscaling_min_capacity" {
+  description = "Min capacity of the scalable target"
+  type        = number
+  default     = 1
+}
+
+variable "autoscaling_max_capacity" {
+  description = "Max capacity of the scalable target"
+  type        = number
+  default     = 2
+}
+
 variable "region" {
   description = "AWS Region where the provider will operate"
   type        = string

@@ -1,3 +1,15 @@
+variable "autoscaling_min_capacity" {
+  description = "Min capacity of the scalable target"
+  type        = number
+  default     = 1
+}
+
+variable "autoscaling_max_capacity" {
+  description = "Max capacity of the scalable target"
+  type        = number
+  default     = 1
+}
+
 variable "product_name" {
   description = "The name of the product"
   type        = string

@@ -79,7 +79,7 @@ resource "aws_iam_role" "this" {
 }
 
 resource "aws_rds_cluster_instance" "this" {
-  count                        = 1
+  count                        = var.autoscaling_min_capacity
   cluster_identifier           = aws_rds_cluster.this.id
   instance_class               = "db.serverless"
   engine                       = aws_rds_cluster.this.engine
@@ -94,8 +94,8 @@ resource "aws_appautoscaling_target" "this" {
   service_namespace  = "rds"
   scalable_dimension = "rds:cluster:ReadReplicaCount"
   resource_id        = "cluster:${aws_rds_cluster.this.id}"
-  min_capacity       = 1
-  max_capacity       = 1
+  min_capacity       = var.autoscaling_min_capacity
+  max_capacity       = var.autoscaling_max_capacity
 }
 
 resource "aws_appautoscaling_policy" "this" {
