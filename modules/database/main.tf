@@ -56,7 +56,7 @@ resource "aws_rds_cluster" "this" {
   }
 }
 
-resource "aws_iam_role" "this" {
+resource "aws_iam_role" "rds" {
   name = "RDSMonitoringRole"
 
   assume_role_policy = jsonencode({
@@ -87,7 +87,7 @@ resource "aws_rds_cluster_instance" "this" {
   db_subnet_group_name         = aws_db_subnet_group.this.name
   performance_insights_enabled = true
   monitoring_interval          = 60
-  monitoring_role_arn          = aws_iam_role.this.arn
+  monitoring_role_arn          = aws_iam_role.rds.arn
 }
 
 resource "aws_appautoscaling_target" "this" {
