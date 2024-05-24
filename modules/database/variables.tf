@@ -48,11 +48,6 @@ variable "subnet_ids" {
   type        = list(string)
 }
 
-variable "subnet_id" {
-  description = "The ID of the subnet"
-  type        = string
-}
-
 variable "private_subnet_cidr_blocks" {
   description = "List of CIDR blocks"
   type        = list(string)

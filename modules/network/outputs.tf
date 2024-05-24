@@ -3,11 +3,6 @@ output "vpc_id" {
   value       = aws_vpc.this.id
 }
 
-output "private_subnet_id" {
-  description = "The ID of the subnet"
-  value       = aws_subnet.private_1.id
-}
-
 output "private_subnet_ids" {
   description = "A list of VPC subnet IDs"
   value       = [aws_subnet.private_1.id, aws_subnet.private_2.id]

@@ -50,7 +50,6 @@ module "database" {
   region                     = var.region
   product_name               = var.product_name
   vpc_id                     = module.network.vpc_id
-  subnet_id                  = module.network.private_subnet_id
   subnet_ids                 = module.network.private_subnet_ids
   private_subnet_cidr_blocks = module.network.private_subnet_cidr_blocks
 }
