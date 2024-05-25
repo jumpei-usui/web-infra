@@ -242,44 +242,8 @@ resource "aws_ecs_task_definition" "this" {
   task_role_arn            = aws_iam_role.ecs_database_connection.arn
   container_definitions = jsonencode([
     {
-      name      = "${var.product_name}-api"
-      image     = "${resource.aws_ecr_repository.this.repository_url}:latest"
-      essential = true
-      portMappings = [
-        {
-          containerPort = 80
-          hostPort      = 80
-          protocol      = "tcp"
-        }
-      ]
-      cpu    = 256
-      memory = 512
-      environment = [
-        {
-          name  = "DBNAME"
-          value = "main"
-        },
-        {
-          name  = "ENDPOINT"
-          value = "${var.rds_cluster_endpoint}"
-        },
-        {
-          name  = "REGION"
-          value = "us-east-1"
-        },
-        {
-          name  = "USER"
-          value = "api"
-        }
-      ]
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          "awslogs-group"         = "/ecs/${var.product_name}-api"
-          "awslogs-region"        = "${var.region}"
-          "awslogs-stream-prefix" = "ecs"
-        }
-      }
+      name  = "${var.product_name}-api"
+      image = "hello-world"
     }
   ])
 }
