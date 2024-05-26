@@ -37,11 +37,15 @@ resource "aws_db_subnet_group" "this" {
   subnet_ids = var.subnet_ids
 }
 
+data "aws_rds_engine_version" "this" {
+  engine       = "aurora-mysql"
+  default_only = true
+}
+
 resource "aws_rds_cluster" "this" {
-  apply_immediately                   = true
   cluster_identifier                  = "${var.product_name}-database"
   engine                              = "aurora-mysql"
-  engine_version                      = var.engine_version
+  engine_version                      = data.aws_rds_engine_version.this.version
   master_username                     = "admin"
   manage_master_user_password         = true
   db_subnet_group_name                = aws_db_subnet_group.this.name
