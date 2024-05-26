@@ -246,6 +246,10 @@ resource "aws_ecs_task_definition" "this" {
       image = "hello-world"
     }
   ])
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 resource "aws_ecs_service" "this" {
