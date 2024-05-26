@@ -53,6 +53,8 @@ resource "aws_rds_cluster" "this" {
   storage_encrypted                   = true
   deletion_protection                 = true
   vpc_security_group_ids              = [aws_security_group.rds.id]
+  preferred_backup_window             = "14:00-14:30"
+  preferred_maintenance_window        = "sun:15:00-sun:16:00"
 
   serverlessv2_scaling_configuration {
     min_capacity = var.min_capacity
